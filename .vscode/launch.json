@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Backend: dotnet run (dev)",
+      "name": "Backend",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "dotnet: build",
@@ -11,24 +11,35 @@
       "cwd": "${workspaceFolder}/backend",
       "stopAtEntry": false,
       "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7060;http://localhost:5241"
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/backend"
       }
+    },
+    {
+      "name": "Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "frontend: dev",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/src"
+    },
+    {
+      "name": "Full Stack (Container)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "compose: prod up",
+      "postDebugTask": "compose: prod down",
+      "url": "http://localhost:18080",
+      "webRoot": "${workspaceFolder}/frontend/src"
     }
   ],
   "compounds": [
     {
-      "name": "Compose: dev up",
-      "configurations": [],
-      "preLaunchTask": "compose: dev up",
-      "stopAll": true
-    },
-    {
-      "name": "Compose: prod up",
-      "configurations": [],
-      "preLaunchTask": "compose: prod up",
+      "name": "Full Stack (Local)",
+      "configurations": ["Backend", "Frontend"],
       "stopAll": true
     }
   ]
