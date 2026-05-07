@@ -60,7 +60,7 @@ public class SdeRefreshService(
                 existing.SecondaryName = source.SecondaryName;
                 existing.ClassNumber = whClass;
                 existing.Class = ClassName(whClass);
-                existing.Effect = string.IsNullOrWhiteSpace(source.Effect) ? null : source.Effect;
+                existing.Effect = string.IsNullOrWhiteSpace(source.Effect?.Name) ? null : source.Effect!.Name;
                 existing.Statics = string.Join(",", source.StaticConnections ?? []);
                 existing.IsShattered = string.Equals(source.SecurityClass, "SHATTERED", StringComparison.OrdinalIgnoreCase) ||
                     string.Equals(source.SecurityClass, "SHATTERED-WH", StringComparison.OrdinalIgnoreCase) ||
@@ -166,9 +166,11 @@ public class SdeRefreshService(
         string? SecondaryName,
         long Id,
         string? SecurityClass,
-        string? Effect,
+        EveDataEffect? Effect,
         int? WhClass,
         List<string>? StaticConnections);
+
+    private sealed record EveDataEffect(string? Name);
 
     private sealed record EveDataWormhole(
         string Type,
