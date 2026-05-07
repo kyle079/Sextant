@@ -55,7 +55,7 @@
       "templateDirectory": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "frontend/src/api/client.generated.ts",
+      "output": "../frontend/src/api/client.generated.ts",
       "newLineBehavior": "Auto"
     }
   }
