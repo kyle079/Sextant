@@ -112,6 +112,8 @@ app.MapHealthChecks("/health").AllowAnonymous();
 // Endpoints
 AuthEndpoints.Map(app);
 SdeEndpoints.Map(app);
+ChainEndpoints.Map(app);
+SigEndpoints.Map(app);
 
 // SPA fallback — serve index.html for all non-API routes
 app.MapFallbackToFile("index.html");

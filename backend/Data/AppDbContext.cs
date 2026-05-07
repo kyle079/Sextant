@@ -11,6 +11,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<WormholeSystem> WormholeSystems => Set<WormholeSystem>();
     public DbSet<WormholeType> WormholeTypes => Set<WormholeType>();
     public DbSet<SdeRefreshRun> SdeRefreshRuns => Set<SdeRefreshRun>();
+    public DbSet<ChainSystem> ChainSystems => Set<ChainSystem>();
+    public DbSet<ChainConnection> ChainConnections => Set<ChainConnection>();
+    public DbSet<Signature> Signatures => Set<Signature>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -63,5 +66,33 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 v => v.HasValue ? v.Value.ToUniversalTime() : v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
         });
+
+        modelBuilder.Entity<ChainSystem>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.SolarSystemId);
+            e.HasQueryFilter(x => x.DeletedAt == null);
+            e.HasMany(x => x.SourceConnections).WithOne(x => x.SourceSystem)
+                .HasForeignKey(x => x.SourceSystemId).OnDelete(DeleteBehavior.Restrict);
+            e.HasMany(x => x.TargetConnections).WithOne(x => x.TargetSystem)
+                .HasForeignKey(x => x.TargetSystemId).OnDelete(DeleteBehavior.Restrict);
+            e.HasMany(x => x.Signatures).WithOne(x => x.ChainSystem)
+                .HasForeignKey(x => x.ChainSystemId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ChainConnection>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasQueryFilter(x => x.DeletedAt == null);
+            e.HasIndex(x => new { x.SourceSystemId, x.TargetSystemId });
+        });
+
+        modelBuilder.Entity<Signature>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasQueryFilter(x => x.DeletedAt == null);
+            e.HasIndex(x => new { x.ChainSystemId, x.SignatureId }).IsUnique();
+        });
+
     }
 }

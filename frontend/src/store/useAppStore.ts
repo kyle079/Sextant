@@ -9,6 +9,7 @@ interface AppState {
   sigPanelOpen: boolean;
   massPanelOpen: boolean;
   sidebarCollapsed: boolean;
+  nodePositions: Record<string, { x: number; y: number }>;
 
   setUser: (user: MeResponse | null) => void;
   setActiveCharacter: (id: number) => void;
@@ -17,6 +18,7 @@ interface AppState {
   setSigPanelOpen: (open: boolean) => void;
   setMassPanelOpen: (open: boolean) => void;
   toggleSidebar: () => void;
+  setNodePosition: (id: string, position: { x: number; y: number }) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -27,6 +29,7 @@ export const useAppStore = create<AppState>((set) => ({
   sigPanelOpen: false,
   massPanelOpen: false,
   sidebarCollapsed: false,
+  nodePositions: {},
 
   setUser: (user) =>
     set({ user, activeCharacterId: user?.primaryCharacterId ?? null }),
@@ -38,4 +41,5 @@ export const useAppStore = create<AppState>((set) => ({
   setSigPanelOpen: (open) => set({ sigPanelOpen: open }),
   setMassPanelOpen: (open) => set({ massPanelOpen: open }),
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  setNodePosition: (id, position) => set((s) => ({ nodePositions: { ...s.nodePositions, [id]: position } })),
 }));
