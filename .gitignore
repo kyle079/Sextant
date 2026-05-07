@@ -49,6 +49,5 @@ keys/
 .idea/
 *.suo
 *.user
-.vscode/
 ~$*
 *~
