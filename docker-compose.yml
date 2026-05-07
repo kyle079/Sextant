@@ -1,0 +1,15 @@
+services:
+  sextant:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./keys:/app/keys
+    environment:
+      - ESI_CLIENT_ID=${ESI_CLIENT_ID:-}
+      - ESI_CLIENT_SECRET=${ESI_CLIENT_SECRET:-}
+      - ESI_CALLBACK_URL=${ESI_CALLBACK_URL:-http://localhost:8080/auth/callback}
+      - ALLOWED_CORP_ID=${ALLOWED_CORP_ID:-0}
+      - Database__Path=/app/data/sextant.db
+    restart: unless-stopped
