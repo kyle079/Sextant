@@ -15,7 +15,10 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink as RouterNavLink } from 'react-router-dom';
+import { apiFetch } from '../api/client';
+import type { SdeStatusResponse } from '../api/types';
 import { useAppStore } from '../store/useAppStore';
 
 const NAV_ITEMS = [
@@ -96,6 +99,16 @@ function CharacterMenu() {
 export function AppShellLayout() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const { data: sdeStatus } = useQuery({
+    queryKey: ['sde', 'status'],
+    queryFn: () => apiFetch<SdeStatusResponse>('/admin/sde/status'),
+    retry: false,
+  });
+  const esiColor = sdeStatus?.state === 'Succeeded'
+    ? 'var(--mantine-color-green-6)'
+    : sdeStatus?.state === 'Failed'
+      ? 'var(--mantine-color-red-6)'
+      : 'var(--mantine-color-yellow-6)';
 
   return (
     <AppShell
@@ -147,8 +160,8 @@ export function AppShellLayout() {
         {/* Status indicators */}
         <Box p="xs" style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}>
           <Group gap="xs">
-            <Tooltip label="ESI connection">
-              <Box w={8} h={8} style={{ borderRadius: '50%', background: 'var(--mantine-color-gray-6)' }} />
+            <Tooltip label={`ESI/SDE status: ${sdeStatus?.state ?? 'unknown'}`}>
+              <Box w={8} h={8} style={{ borderRadius: '50%', background: esiColor }} />
             </Tooltip>
             <Text size="xs" c="dimmed">ESI</Text>
             <Tooltip label="Real-time connection">

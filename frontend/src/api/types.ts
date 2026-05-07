@@ -13,3 +13,13 @@ export interface MeResponse {
   role: 'Admin' | 'Member' | 'ReadOnly';
   characters: CharacterInfo[];
 }
+
+
+export interface SdeStatusResponse {
+  lastRefreshStartedAt?: string | null;
+  lastRefreshCompletedAt?: string | null;
+  state: string;
+  wormholeSystemCount: number;
+  wormholeTypeCount: number;
+  error?: string | null;
+}
