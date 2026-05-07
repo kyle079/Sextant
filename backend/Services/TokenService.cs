@@ -56,6 +56,12 @@ public class TokenService(
         return response;
     }
 
+    public async Task<string> RefreshAccessToken(long characterId)
+    {
+        cache.Remove($"access:{characterId}");
+        return await GetAccessToken(characterId);
+    }
+
     private async Task<SsoTokens> ExchangeRefreshToken(string refreshToken)
     {
         return await PostToTokenEndpoint(new Dictionary<string, string>

@@ -5,6 +5,7 @@ using Scalar.AspNetCore;
 using Sextant.Data;
 using Sextant.Endpoints;
 using Sextant.Services;
+using Sextant.Services.Esi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,25 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 // HTTP clients (ESI + SSO token exchange)
+builder.Services.AddTransient<AuthHandler>();
+builder.Services.AddTransient<RateLimitHandler>();
+builder.Services.AddTransient<CacheHandler>();
+
+builder.Services.AddHttpClient<EsiClient>(client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration["ESI:BaseUrl"] ?? "https://esi.evetech.net/latest/");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Sextant/1.0");
+    })
+    .AddHttpMessageHandler<AuthHandler>()
+    .AddHttpMessageHandler<RateLimitHandler>()
+    .AddHttpMessageHandler<CacheHandler>()
+    .AddStandardResilienceHandler();
+
+builder.Services.AddHttpClient("sde", client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Sextant/1.0");
+});
+
 builder.Services.AddHttpClient();
 
 // Memory cache (access token caching)
@@ -52,6 +72,8 @@ builder.Services.AddMemoryCache();
 
 // App services
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<SdeRefreshService>();
+builder.Services.AddHostedService<SdeRefreshHostedService>();
 
 // OpenAPI + Scalar
 builder.Services.AddOpenApi();
@@ -87,8 +109,11 @@ app.MapScalarApiReference(options =>
 // Health check
 app.MapHealthChecks("/health").AllowAnonymous();
 
-// Auth endpoints
+// Endpoints
 AuthEndpoints.Map(app);
+SdeEndpoints.Map(app);
+ChainEndpoints.Map(app);
+SigEndpoints.Map(app);
 
 // SPA fallback — serve index.html for all non-API routes
 app.MapFallbackToFile("index.html");

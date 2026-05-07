@@ -7,7 +7,11 @@ interface Props {
   limit?: number;
 }
 
-export function ActivityFeed({ typeFilter: _typeFilter, systemFilter: _systemFilter, limit: _limit }: Props) {
+export function ActivityFeed({ typeFilter, systemFilter, limit }: Props) {
+  void typeFilter;
+  void systemFilter;
+  void limit;
+
   return (
     <Paper p="md" radius="sm" withBorder>
       <Stack gap="sm">

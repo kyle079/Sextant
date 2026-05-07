@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import 'reactflow/dist/style.css';
 
 import App from './App';
 
