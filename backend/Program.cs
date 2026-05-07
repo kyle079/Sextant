@@ -5,6 +5,7 @@ using Scalar.AspNetCore;
 using Sextant.Data;
 using Sextant.Endpoints;
 using Sextant.Services;
+using Sextant.Services.Esi;
 
 var builder = WebApplication.CreateBuilder(args);
 

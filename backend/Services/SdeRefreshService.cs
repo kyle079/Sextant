@@ -51,14 +51,15 @@ public class SdeRefreshService(
             var now = DateTime.UtcNow;
             foreach (var source in systems.Where(x => x.WhClass.HasValue))
             {
+                var whClass = source.WhClass.GetValueOrDefault();
                 var existing = await db.WormholeSystems
                     .FirstOrDefaultAsync(x => x.SolarSystemId == source.Id, cancellationToken);
                 existing ??= new WormholeSystem { SolarSystemId = source.Id };
 
                 existing.Name = source.Name;
                 existing.SecondaryName = source.SecondaryName;
-                existing.ClassNumber = source.WhClass;
-                existing.Class = ClassName(source.WhClass.Value);
+                existing.ClassNumber = whClass;
+                existing.Class = ClassName(whClass);
                 existing.Effect = string.IsNullOrWhiteSpace(source.Effect) ? null : source.Effect;
                 existing.Statics = string.Join(",", source.StaticConnections ?? []);
                 existing.IsShattered = string.Equals(source.SecurityClass, "SHATTERED", StringComparison.OrdinalIgnoreCase) ||

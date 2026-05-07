@@ -17,7 +17,7 @@ public class CacheHandler(IMemoryCache cache) : DelegatingHandler
         if (!response.IsSuccessStatusCode)
             return response;
 
-        var expires = response.Content.Headers.Expires ?? response.Headers.Expires;
+        var expires = response.Content.Headers.Expires;
         if (!expires.HasValue || expires.Value <= DateTimeOffset.UtcNow)
             return response;
 
@@ -29,6 +29,7 @@ public class CacheHandler(IMemoryCache cache) : DelegatingHandler
             response.Content.Headers.ContentType?.ToString());
 
         cache.Set(cacheKey, cachedResponse, expires.Value);
+        response.Dispose();
         return cachedResponse.ToHttpResponseMessage(request);
     }
 

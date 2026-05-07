@@ -93,9 +93,14 @@ namespace Sextant.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "SdeRefreshRuns");
-            migrationBuilder.DropTable(name: "WormholeSystems");
-            migrationBuilder.DropTable(name: "WormholeTypes");
+            migrationBuilder.DropTable(
+                name: "SdeRefreshRuns");
+
+            migrationBuilder.DropTable(
+                name: "WormholeSystems");
+
+            migrationBuilder.DropTable(
+                name: "WormholeTypes");
         }
     }
 }

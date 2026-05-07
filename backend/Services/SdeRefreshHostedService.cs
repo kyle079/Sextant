@@ -12,7 +12,8 @@ public class SdeRefreshHostedService(IServiceProvider services, ILogger<SdeRefre
         using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Tuesday && DateTime.UtcNow.Hour == 11 && DateTime.UtcNow.Minute >= 15)
+            var now = DateTime.UtcNow;
+            if (now.DayOfWeek == DayOfWeek.Tuesday && (now.Hour > 11 || (now.Hour == 11 && now.Minute >= 15)))
                 await RefreshIfStale(stoppingToken);
         }
     }
