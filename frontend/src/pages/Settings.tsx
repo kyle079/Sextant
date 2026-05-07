@@ -12,11 +12,13 @@ import {
   Paper,
   ActionIcon,
   Tooltip,
+  SimpleGrid,
+  Alert,
 } from '@mantine/core';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../api/client';
-import type { MeResponse } from '../api/types';
+import type { MeResponse, SdeStatusResponse } from '../api/types';
 
 function MyCharactersTab() {
   const queryClient = useQueryClient();
@@ -96,6 +98,80 @@ function MyCharactersTab() {
   );
 }
 
+function SdeDataTab() {
+  const queryClient = useQueryClient();
+  const { data: me } = useQuery({
+    queryKey: ['auth', 'me'],
+    queryFn: () => apiFetch<MeResponse>('/auth/me'),
+  });
+  const { data: status, isLoading } = useQuery({
+    queryKey: ['sde', 'status'],
+    queryFn: () => apiFetch<SdeStatusResponse>('/admin/sde/status'),
+  });
+
+  const refresh = useMutation({
+    mutationFn: () => apiFetch<SdeStatusResponse>('/admin/sde/refresh', { method: 'POST' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sde', 'status'] }),
+  });
+
+  const isAdmin = me?.role === 'Admin';
+
+  return (
+    <Stack gap="md">
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Text fw={600}>Wormhole reference data</Text>
+          <Text size="sm" c="dimmed">
+            Loaded from EVE static data sources and cached in Sextant for chain-map autocomplete and wormhole mass/lifetime lookups.
+          </Text>
+        </div>
+        <Button
+          size="sm"
+          color="cyan"
+          disabled={!isAdmin}
+          loading={refresh.isPending}
+          onClick={() => refresh.mutate()}
+        >
+          Force Refresh
+        </Button>
+      </Group>
+
+      {!isAdmin && (
+        <Alert color="yellow" variant="light">
+          Only admins can force an SDE refresh. Current status is visible to all signed-in members.
+        </Alert>
+      )}
+
+      {status?.error && <Alert color="red">Last refresh error: {status.error}</Alert>}
+
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }}>
+        <Paper withBorder p="md" radius="sm">
+          <Text size="xs" c="dimmed" tt="uppercase">Status</Text>
+          <Badge color={status?.state === 'Succeeded' ? 'green' : status?.state === 'Failed' ? 'red' : 'yellow'}>
+            {isLoading ? 'Loading' : status?.state ?? 'Unknown'}
+          </Badge>
+        </Paper>
+        <Paper withBorder p="md" radius="sm">
+          <Text size="xs" c="dimmed" tt="uppercase">WH systems</Text>
+          <Text fw={700}>{status?.wormholeSystemCount ?? '—'}</Text>
+        </Paper>
+        <Paper withBorder p="md" radius="sm">
+          <Text size="xs" c="dimmed" tt="uppercase">WH types</Text>
+          <Text fw={700}>{status?.wormholeTypeCount ?? '—'}</Text>
+        </Paper>
+        <Paper withBorder p="md" radius="sm">
+          <Text size="xs" c="dimmed" tt="uppercase">Last refresh</Text>
+          <Text size="sm">
+            {status?.lastRefreshCompletedAt
+              ? new Date(status.lastRefreshCompletedAt).toLocaleString()
+              : 'Never'}
+          </Text>
+        </Paper>
+      </SimpleGrid>
+    </Stack>
+  );
+}
+
 export default function Settings() {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') ?? 'characters';
@@ -120,9 +196,7 @@ export default function Settings() {
           </Tabs.Panel>
 
           <Tabs.Panel value="sde" pt="md">
-            <Center py="xl">
-              <Text c="dimmed" size="sm">SDE data management coming in Release 2.</Text>
-            </Center>
+            <SdeDataTab />
           </Tabs.Panel>
 
           <Tabs.Panel value="corp" pt="md">

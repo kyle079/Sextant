@@ -14,14 +14,18 @@ function formatDuration(ms: number): string {
 }
 
 export function EolCountdown({ eolAt }: Props) {
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
+    const first = setTimeout(() => setNow(Date.now()), 0);
     const id = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
   }, []);
 
-  if (!eolAt) return null;
+  if (!eolAt || now === 0) return null;
 
   const remaining = new Date(eolAt).getTime() - now;
   const hoursLeft = remaining / 3_600_000;

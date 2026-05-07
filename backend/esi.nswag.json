@@ -1,0 +1,28 @@
+{
+  "runtime": "Net100",
+  "documentGenerator": {
+    "fromDocument": {
+      "url": "https://esi.evetech.net/latest/swagger.json",
+      "output": null
+    }
+  },
+  "codeGenerators": {
+    "openApiToCSharpClient": {
+      "className": "EsiClient",
+      "namespace": "Sextant.Services.Esi",
+      "operationGenerationMode": "SingleClientFromOperationId",
+      "includedOperationIds": [
+        "get_status",
+        "get_universe_types_type_id"
+      ],
+      "jsonLibrary": "SystemTextJson",
+      "generateNullableReferenceTypes": true,
+      "generateOptionalParameters": true,
+      "injectHttpClient": true,
+      "disposeHttpClient": false,
+      "useBaseUrl": false,
+      "exceptionClass": "EsiApiException",
+      "output": "Services/EsiClient.generated.cs"
+    }
+  }
+}
