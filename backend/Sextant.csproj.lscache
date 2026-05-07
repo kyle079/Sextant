@@ -424,6 +424,8 @@ Services/
  microsoft.extensions.telemetry.abstractions/10.5.0/lib/net10.0/Microsoft.Extensions.Telemetry.Abstractions.dll
  microsoft.extensions.telemetry/10.5.0/lib/net10.0/Microsoft.Extensions.Telemetry.dll
  microsoft.openapi/2.0.0/lib/net8.0/Microsoft.OpenApi.dll
+ npgsql.entityframeworkcore.postgresql/10.0.1/lib/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+ npgsql/10.0.2/lib/net10.0/Npgsql.dll
  polly.core/8.4.2/lib/net8.0/Polly.Core.dll
  polly.extensions/8.4.2/lib/net8.0/Polly.Extensions.dll
  polly.ratelimiting/8.4.2/lib/net8.0/Polly.RateLimiting.dll

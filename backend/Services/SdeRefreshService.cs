@@ -78,7 +78,7 @@ public class SdeRefreshService(
 
                 existing.DestinationType = source.Destination?.Type;
                 existing.DestinationClass = source.Destination?.WhClass;
-                existing.LifetimeHours = source.LifetimeHrs;
+                existing.LifetimeHours = (int)source.LifetimeHrs;
                 existing.MaxMassKg = source.Mass?.Total;
                 existing.MaxJumpMassKg = source.Mass?.Jump;
                 existing.ScanStrength = scanStrengths.GetValueOrDefault(source.Type);
@@ -174,7 +174,7 @@ public class SdeRefreshService(
 
     private sealed record EveDataWormhole(
         string Type,
-        int LifetimeHrs,
+        double LifetimeHrs,
         EveDataEndpoint? Destination,
         EveDataMass? Mass);
 
