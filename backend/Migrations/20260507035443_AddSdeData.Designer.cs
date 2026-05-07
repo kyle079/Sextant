@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sextant.Data;
 
@@ -10,9 +11,11 @@ using Sextant.Data;
 namespace Sextant.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507035443_AddSdeData")]
+    partial class AddSdeData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -49,120 +52,6 @@ namespace Sextant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ActivityEvents");
-                });
-
-            modelBuilder.Entity("Sextant.Models.ChainConnection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("EolAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("LifetimeHours")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("MassStatus")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("MaxJumpMassKg")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("MaxMassKg")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ScannedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SignatureId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SourceSystemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TargetSystemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("WormholeTypeCode")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TargetSystemId");
-
-                    b.HasIndex("SourceSystemId", "TargetSystemId");
-
-                    b.ToTable("ChainConnections");
-                });
-
-            modelBuilder.Entity("Sextant.Models.ChainSystem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Class")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ClassNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Effect")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsHome")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("SolarSystemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Statics")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SolarSystemId");
-
-                    b.ToTable("ChainSystems");
                 });
 
             modelBuilder.Entity("Sextant.Models.CharacterToken", b =>
@@ -235,60 +124,6 @@ namespace Sextant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SdeRefreshRuns");
-                });
-
-            modelBuilder.Entity("Sextant.Models.Signature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ChainSystemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("EolAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("ScanPercentage")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("ScannedByCharacterId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ScannedByCharacterName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SignatureId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChainSystemId", "SignatureId")
-                        .IsUnique();
-
-                    b.ToTable("Signatures");
                 });
 
             modelBuilder.Entity("Sextant.Models.User", b =>
@@ -407,25 +242,6 @@ namespace Sextant.Migrations
                     b.ToTable("WormholeTypes");
                 });
 
-            modelBuilder.Entity("Sextant.Models.ChainConnection", b =>
-                {
-                    b.HasOne("Sextant.Models.ChainSystem", "SourceSystem")
-                        .WithMany("SourceConnections")
-                        .HasForeignKey("SourceSystemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Sextant.Models.ChainSystem", "TargetSystem")
-                        .WithMany("TargetConnections")
-                        .HasForeignKey("TargetSystemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SourceSystem");
-
-                    b.Navigation("TargetSystem");
-                });
-
             modelBuilder.Entity("Sextant.Models.CharacterToken", b =>
                 {
                     b.HasOne("Sextant.Models.User", "User")
@@ -435,26 +251,6 @@ namespace Sextant.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Sextant.Models.Signature", b =>
-                {
-                    b.HasOne("Sextant.Models.ChainSystem", "ChainSystem")
-                        .WithMany("Signatures")
-                        .HasForeignKey("ChainSystemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChainSystem");
-                });
-
-            modelBuilder.Entity("Sextant.Models.ChainSystem", b =>
-                {
-                    b.Navigation("Signatures");
-
-                    b.Navigation("SourceConnections");
-
-                    b.Navigation("TargetConnections");
                 });
 
             modelBuilder.Entity("Sextant.Models.User", b =>
