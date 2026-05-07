@@ -1,7 +1,9 @@
 import {
   AppShell,
+  Avatar,
   Burger,
   Group,
+  Menu,
   NavLink,
   Text,
   ThemeIcon,
@@ -10,6 +12,7 @@ import {
   Badge,
   rem,
   Stack,
+  UnstyledButton,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Outlet, NavLink as RouterNavLink } from 'react-router-dom';
@@ -27,10 +30,72 @@ const NAV_ITEMS = [
   { path: '/settings', label: 'Settings', icon: '⋮' },
 ] as const;
 
+function CharacterMenu() {
+  const { user, activeCharacterId, setActiveCharacter } = useAppStore();
+  if (!user) return null;
+
+  const active = user.characters.find((c) => c.characterId === activeCharacterId)
+    ?? user.characters[0];
+
+  if (!active) return null;
+
+  const handleLogout = async () => {
+    await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+    window.location.href = '/login';
+  };
+
+  return (
+    <Menu shadow="md" width={220} position="bottom-end">
+      <Menu.Target>
+        <UnstyledButton>
+          <Group gap="xs">
+            <Avatar src={active.portraitUrl} size={32} radius="xl" />
+            <Box visibleFrom="sm">
+              <Text size="sm" fw={600} lh={1.2}>
+                {active.characterName}
+              </Text>
+              <Text size="xs" c="dimmed">
+                {user.role}
+              </Text>
+            </Box>
+          </Group>
+        </UnstyledButton>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Label>Characters</Menu.Label>
+        {user.characters.map((c) => (
+          <Menu.Item
+            key={c.characterId}
+            leftSection={<Avatar src={c.portraitUrl} size={20} radius="xl" />}
+            rightSection={
+              c.characterId === activeCharacterId ? (
+                <Badge size="xs" color="cyan">
+                  Active
+                </Badge>
+              ) : null
+            }
+            onClick={() => setActiveCharacter(c.characterId)}
+          >
+            {c.characterName}
+          </Menu.Item>
+        ))}
+
+        <Menu.Divider />
+        <Menu.Item component="a" href="/settings?tab=characters">
+          Manage Characters
+        </Menu.Item>
+        <Menu.Item color="red" onClick={handleLogout}>
+          Log Out
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
 export function AppShellLayout() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const user = useAppStore((s) => s.user);
 
   return (
     <AppShell
@@ -53,22 +118,7 @@ export function AppShellLayout() {
             </Text>
           </Group>
 
-          <Group gap="sm">
-            {user ? (
-              <>
-                <Badge variant="dot" color="cyan" size="sm">
-                  {user.characterName}
-                </Badge>
-                <Badge variant="outline" color="gray" size="xs">
-                  {user.role}
-                </Badge>
-              </>
-            ) : (
-              <Badge variant="dot" color="gray" size="sm">
-                Not logged in
-              </Badge>
-            )}
-          </Group>
+          <CharacterMenu />
         </Group>
       </AppShell.Header>
 
@@ -94,23 +144,15 @@ export function AppShellLayout() {
           ))}
         </Stack>
 
-        {/* Status bar at bottom of sidebar */}
+        {/* Status indicators */}
         <Box p="xs" style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}>
           <Group gap="xs">
-            <Tooltip label="ESI connection status">
-              <Box
-                w={8}
-                h={8}
-                style={{ borderRadius: '50%', background: 'var(--mantine-color-gray-6)' }}
-              />
+            <Tooltip label="ESI connection">
+              <Box w={8} h={8} style={{ borderRadius: '50%', background: 'var(--mantine-color-gray-6)' }} />
             </Tooltip>
             <Text size="xs" c="dimmed">ESI</Text>
-            <Tooltip label="Real-time connection status">
-              <Box
-                w={8}
-                h={8}
-                style={{ borderRadius: '50%', background: 'var(--mantine-color-gray-6)' }}
-              />
+            <Tooltip label="Real-time connection">
+              <Box w={8} h={8} style={{ borderRadius: '50%', background: 'var(--mantine-color-gray-6)' }} />
             </Tooltip>
             <Text size="xs" c="dimmed">Live</Text>
           </Group>

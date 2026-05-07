@@ -1,10 +1,14 @@
-// Thin wrapper around the NSwag-generated client.
-// Run `nswag run` from the project root to regenerate client.generated.ts.
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
 
 const baseUrl = import.meta.env.VITE_API_URL ?? '';
-
-// Placeholder until NSwag generation produces client.generated.ts
-export const apiBase = baseUrl;
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${baseUrl}${path}`, {
@@ -12,7 +16,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     headers: { 'Content-Type': 'application/json', ...init?.headers },
     credentials: 'include',
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+  if (!res.ok) throw new ApiError(res.status, `${res.status} ${res.statusText}`);
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
