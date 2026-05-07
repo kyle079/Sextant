@@ -1,0 +1,68 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compose: dev up",
+      "type": "shell",
+      "command": "docker compose --profile dev up --build -d",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "compose: dev down",
+      "type": "shell",
+      "command": "docker compose --profile dev down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "compose: prod up",
+      "type": "shell",
+      "command": "docker compose --profile prod up --build -d",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "compose: prod down",
+      "type": "shell",
+      "command": "docker compose --profile prod down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "compose: logs (dev)",
+      "type": "shell",
+      "command": "docker compose --profile dev logs -f sextant-dev",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "compose: logs (prod)",
+      "type": "shell",
+      "command": "docker compose --profile prod logs -f sextant",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "dotnet: restore",
+      "type": "shell",
+      "command": "dotnet restore",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+    {
+      "label": "dotnet: build",
+      "type": "shell",
+      "command": "dotnet build --no-restore",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "dependsOn": "dotnet: restore",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

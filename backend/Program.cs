@@ -12,8 +12,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Database
 var dbPath = builder.Configuration["Database:Path"] ?? "data/sextant.db";
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(dbPath))!);
+var defaultConnection = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+{
+    if (!string.IsNullOrWhiteSpace(defaultConnection))
+    {
+        options.UseNpgsql(defaultConnection);
+    }
+    else
+    {
+        options.UseSqlite($"Data Source={dbPath}");
+    }
+});
 
 // Data Protection — persists encryption keys across restarts
 var keysPath = builder.Environment.IsDevelopment() ? "keys" : "/app/keys";

@@ -1,0 +1,61 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: dotnet run (dev)",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/backend/Sextant.csproj",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "preLaunchTask": "dotnet: build"
+    },
+    {
+      "name": "Docker: dev (SQLite)",
+      "type": "docker-compose",
+      "request": "launch",
+      "dockerCompose": {
+        "up": {
+          "customOptions": "--profile dev",
+          "detached": true,
+          "build": true
+        },
+        "down": {
+          "customOptions": "--profile dev"
+        },
+        "files": ["${workspaceFolder}/docker-compose.yml"]
+      }
+    },
+    {
+      "name": "Docker: prod (PostgreSQL)",
+      "type": "docker-compose",
+      "request": "launch",
+      "dockerCompose": {
+        "up": {
+          "customOptions": "--profile prod",
+          "detached": true,
+          "build": true
+        },
+        "down": {
+          "customOptions": "--profile prod"
+        },
+        "files": ["${workspaceFolder}/docker-compose.yml"]
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Compose: dev up + logs",
+      "configurations": [],
+      "preLaunchTask": "compose: dev up",
+      "stopAll": true
+    },
+    {
+      "name": "Compose: prod up + logs",
+      "configurations": [],
+      "preLaunchTask": "compose: prod up",
+      "stopAll": true
+    }
+  ]
+}

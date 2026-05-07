@@ -1,15 +1,75 @@
 services:
-  sextant:
+  sextant-dev:
+    profiles: ["dev"]
     build: .
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-18080}:8080"
     volumes:
       - ./data:/app/data
       - ./keys:/app/keys
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - Database__Path=/app/data/sextant.db
       - ESI__ClientId=${ESI_CLIENT_ID:-}
       - ESI__ClientSecret=${ESI_CLIENT_SECRET:-}
-      - ESI__CallbackUrl=${ESI_CALLBACK_URL:-http://localhost:8080/auth/callback}
+      - ESI__CallbackUrl=${ESI_CALLBACK_URL:-https://localhost:7060/auth/callback}
       - App__AllowedCorpId=${ALLOWED_CORP_ID:-0}
     restart: unless-stopped
+
+  sextant:
+    profiles: ["prod"]
+    build: .
+    ports:
+      - "127.0.0.1:${APP_PORT:-18080}:8080"
+    volumes:
+      - ./keys:/app/keys
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=${POSTGRES_DB:-sextant};Username=${POSTGRES_USER:-sextant};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required for prod profile}
+      - ESI__ClientId=${ESI_CLIENT_ID:-}
+      - ESI__ClientSecret=${ESI_CLIENT_SECRET:-}
+      - ESI__CallbackUrl=${ESI_CALLBACK_URL:?ESI_CALLBACK_URL must be set to your public domain for prod, e.g. https://sextant.yourdomain.com/auth/callback}
+      - App__AllowedCorpId=${ALLOWED_CORP_ID:-0}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    profiles: ["prod"]
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-sextant}
+      - POSTGRES_USER=${POSTGRES_USER:-sextant}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required for prod profile}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sextant} -d ${POSTGRES_DB:-sextant}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  db-backup:
+    profiles: ["prod"]
+    image: prodrigestivill/postgres-backup-local:16
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB:-sextant}
+      - POSTGRES_USER=${POSTGRES_USER:-sextant}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required for prod profile}
+      - SCHEDULE=${BACKUP_SCHEDULE:-@daily}
+      - BACKUP_KEEP_DAYS=${BACKUP_KEEP_DAYS:-7}
+      - BACKUP_KEEP_WEEKS=${BACKUP_KEEP_WEEKS:-4}
+      - BACKUP_KEEP_MONTHS=${BACKUP_KEEP_MONTHS:-6}
+      - BACKUP_SUFFIX=.sql.gz
+    volumes:
+      - ./backups:/backups
+    restart: unless-stopped
+
+volumes:
+  pg_data:
