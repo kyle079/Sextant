@@ -1,6 +1,8 @@
 {
   "version": "0.2.0",
   "configurations": [
+    
+
     {
       "name": "Backend",
       "type": "coreclr",
@@ -27,11 +29,25 @@
       "webRoot": "${workspaceFolder}/frontend/src"
     },
     {
-      "name": "Full Stack (Container)",
+      "name": "Backend (Container)",
+      "type": "coreclr",
+      "request": "attach",
+      "preLaunchTask": "compose: prod up",
+      "processName": "Sextant",
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": ["exec", "-i", "sextant-sextant-1"],
+        "debuggerPath": "/vsdbg/vsdbg",
+        "pipeCwd": "${workspaceFolder}"
+      },
+      "sourceFileMap": {
+        "/app": "${workspaceFolder}/backend"
+      }
+    },
+    {
+      "name": "Frontend (Container)",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "compose: prod up",
-      "postDebugTask": "compose: prod down",
       "url": "http://localhost:18080",
       "webRoot": "${workspaceFolder}/frontend/src"
     }
@@ -40,6 +56,12 @@
     {
       "name": "Full Stack (Local)",
       "configurations": ["Backend", "Frontend"],
+      "stopAll": true
+    },
+    {
+      "name": "Full Stack (Container)",
+      "configurations": ["Backend (Container)", "Frontend (Container)"],
+      "postDebugTask": "compose: prod down",
       "stopAll": true
     }
   ]

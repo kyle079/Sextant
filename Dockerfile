@@ -20,10 +20,17 @@ RUN dotnet publish -c Release -o /publish --no-restore
 # Stage 3: Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-COPY --from=backend-build /publish ./
 
-# Directories for persistent data
+# Install vsdbg before copying app files so this layer is cached independently
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl unzip \
+    && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg \
+    && apt-get remove -y curl unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /app/data /app/keys
+
+COPY --from=backend-build /publish ./
 
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080

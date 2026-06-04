@@ -37,7 +37,7 @@
     {
       "label": "compose: prod up",
       "type": "shell",
-      "command": "docker compose --env-file .development.env --profile prod up --build -d",
+      "command": "docker compose --env-file .development.env --profile prod up --build -d --wait",
       "options": { "cwd": "${workspaceFolder}" },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
     },
