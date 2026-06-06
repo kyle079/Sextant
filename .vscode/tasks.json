@@ -1,0 +1,52 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "Local:"
+        }
+      },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "dotnet: restore",
+      "type": "shell",
+      "command": "dotnet restore",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+    {
+      "label": "dotnet: build",
+      "type": "shell",
+      "command": "dotnet build --no-restore",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "dependsOn": "dotnet: restore",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "compose: prod up",
+      "type": "shell",
+      "command": "docker compose --env-file .development.env --profile prod up --build -d --wait",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "compose: prod down",
+      "type": "shell",
+      "command": "docker compose --profile prod down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ]
+}
